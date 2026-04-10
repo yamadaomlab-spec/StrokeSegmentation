@@ -60,6 +60,7 @@ class LMDBStrokeDataset(Dataset):
         max_retries: int = 10,
         max_samples: int = 0,          # 0=全件, N>0=先頭N件に制限
     ):
+        self.lmdb_path = lmdb_path
         self.thickness_range = thickness_range
         self.thickness_fixed = thickness_fixed
         self.augment = augment
@@ -72,17 +73,31 @@ class LMDBStrokeDataset(Dataset):
             junction_sigma=junction_sigma,
         )
 
-        self.env = lmdb.open(
-            lmdb_path,
-            readonly=True,
-            lock=False,
-            readahead=False,
-            meminit=False,
-        )
-        with self.env.begin() as txn:
+        # サンプル数だけ取得して env を閉じる
+        # (fork後のworkerでの再オープンを避けるため __init__ では開いたままにしない)
+        env = lmdb.open(lmdb_path, readonly=True, lock=False, readahead=False, meminit=False)
+        with env.begin() as txn:
             self.num_samples = int(txn.get(b"num_sample"))
+        env.close()
+
         if max_samples > 0:
             self.num_samples = min(max_samples, self.num_samples)
+
+        # workerごとに遅延初期化される env (forkセーフ)
+        self._env = None
+
+    @property
+    def env(self):
+        """LMDB 環境を遅延初期化して返す。fork後の各workerで独立して開く。"""
+        if self._env is None:
+            self._env = lmdb.open(
+                self.lmdb_path,
+                readonly=True,
+                lock=False,
+                readahead=False,
+                meminit=False,
+            )
+        return self._env
 
     def __len__(self):
         return self.num_samples
