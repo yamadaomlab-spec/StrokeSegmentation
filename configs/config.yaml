@@ -1,7 +1,7 @@
 DATA:
   # PEN-Net の data_lmdb を共有して使用する
-  lmdb_train: /prj/dhp/PEN-Net/data/data_lmdb/pot/train
-  lmdb_test:  /prj/dhp/PEN-Net/data/data_lmdb/pot/test
+  lmdb_train: ../PEN-Net/data/data_lmdb/pot/train
+  lmdb_test:  ../PEN-Net/data/data_lmdb/pot/test
   img_size: 128          # 入力画像サイズ (img_size x img_size) ※256→128で約4倍高速化
   margin: 6              # 正規化時の余白 (px)
   thickness_min: 1       # 線幅最小値 (訓練時ランダム)
