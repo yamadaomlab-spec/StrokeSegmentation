@@ -1,0 +1,48 @@
+DATA:
+  # PEN-Net の data_lmdb を共有して使用する
+  lmdb_train: /prj/dhp/PEN-Net/data/data_lmdb/pot/train
+  lmdb_test:  /prj/dhp/PEN-Net/data/data_lmdb/pot/test
+  img_size: 256          # 入力画像サイズ (img_size x img_size)
+  margin: 12             # 正規化時の余白 (px)
+  thickness_min: 1       # 線幅最小値 (訓練時ランダム)
+  thickness_max: 3       # 線幅最大値
+  thickness_test: 2      # テスト時固定線幅
+  endpoint_sigma: 3.0    # 端点ヒートマップのガウス sigma
+  junction_sigma: 5.0    # 交差点ヒートマップのガウス sigma
+  num_workers: 4
+  augment: true          # 訓練時データ拡張 (回転・反転)
+
+MODEL:
+  emb_dim: 8             # Embedding head の次元数 (設計書推奨: 8〜16)
+  # encoder_base_ch: 64  # エンコーダ基底チャネル数
+
+TRAIN:
+  batch_size: 16
+  max_epochs: 100
+  lr: 4.0e-4
+  weight_decay: 1.0e-2
+  warmup_epochs: 5       # LRウォームアップ期間
+  save_every: 5          # チェックポイント保存間隔 (epoch)
+  log_every: 100         # ログ出力間隔 (iteration)
+  output_dir: ./outputs
+  resume: ""             # 再開するチェックポイントパス (空文字で新規)
+  amp: true              # Automatic Mixed Precision を使用するか
+
+LOSS:
+  lambda_fg:   1.0       # Foreground BCE+Dice 損失の重み
+  lambda_emb:  1.0       # Discriminative embedding 損失の重み
+  lambda_ori:  0.5       # Orientation 損失の重み
+  lambda_end:  0.5       # Endpoint focal 損失の重み
+  lambda_junc: 0.5       # Junction focal 損失の重み
+  # Discriminative loss params
+  delta_v:     0.5       # variance margin (同一ストローク凝集)
+  delta_d:     1.5       # distance margin (異ストローク分離)
+  lambda_reg:  1.0e-3    # 重心正則化係数
+  # Focal loss params
+  focal_alpha: 0.25
+  focal_gamma: 2.0
+
+INFER:
+  fg_threshold:      0.5
+  dbscan_eps:        0.3  # DBSCAN: embedding 空間の eps
+  dbscan_min_samples: 5   # DBSCAN: 最小サンプル数

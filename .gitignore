@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# 訓練出力
+outputs/
+vis_output/
+inspect_out/
+
+# ログ
+runs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
