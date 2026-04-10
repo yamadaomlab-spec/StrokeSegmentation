@@ -2,26 +2,27 @@ DATA:
   # PEN-Net の data_lmdb を共有して使用する
   lmdb_train: /prj/dhp/PEN-Net/data/data_lmdb/pot/train
   lmdb_test:  /prj/dhp/PEN-Net/data/data_lmdb/pot/test
-  img_size: 256          # 入力画像サイズ (img_size x img_size)
-  margin: 12             # 正規化時の余白 (px)
+  img_size: 128          # 入力画像サイズ (img_size x img_size) ※256→128で約4倍高速化
+  margin: 6              # 正規化時の余白 (px)
   thickness_min: 1       # 線幅最小値 (訓練時ランダム)
-  thickness_max: 3       # 線幅最大値
-  thickness_test: 2      # テスト時固定線幅
-  endpoint_sigma: 3.0    # 端点ヒートマップのガウス sigma
-  junction_sigma: 5.0    # 交差点ヒートマップのガウス sigma
+  thickness_max: 2       # 線幅最大値
+  thickness_test: 1      # テスト時固定線幅
+  endpoint_sigma: 2.0    # 端点ヒートマップのガウス sigma
+  junction_sigma: 3.0    # 交差点ヒートマップのガウス sigma
   num_workers: 4
   augment: true          # 訓練時データ拡張 (回転・反転)
+  max_samples: 100000    # 0=全件(913,904), N>0=先頭N件に制限
 
 MODEL:
   emb_dim: 8             # Embedding head の次元数 (設計書推奨: 8〜16)
   # encoder_base_ch: 64  # エンコーダ基底チャネル数
 
 TRAIN:
-  batch_size: 16
-  max_epochs: 100
-  lr: 4.0e-4
+  batch_size: 64
+  max_epochs: 50
+  lr: 1.6e-3             # batch_size=64 に合わせて調整 (base 4e-4 × 4)
   weight_decay: 1.0e-2
-  warmup_epochs: 5       # LRウォームアップ期間
+  warmup_epochs: 3       # LRウォームアップ期間
   save_every: 5          # チェックポイント保存間隔 (epoch)
   log_every: 100         # ログ出力間隔 (iteration)
   output_dir: ./outputs

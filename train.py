@@ -184,6 +184,7 @@ def main():
     print(f"Device: {device}")
 
     # --- Dataset & DataLoader ---
+    max_samples = cfg["DATA"].get("max_samples", 0)
     train_ds = LMDBStrokeDataset(
         lmdb_path        = cfg["DATA"]["lmdb_train"],
         img_size         = cfg["DATA"]["img_size"],
@@ -193,6 +194,7 @@ def main():
         endpoint_sigma   = cfg["DATA"]["endpoint_sigma"],
         junction_sigma   = cfg["DATA"]["junction_sigma"],
         augment          = cfg["DATA"]["augment"],
+        max_samples      = max_samples,
     )
     val_ds = LMDBStrokeDataset(
         lmdb_path        = cfg["DATA"]["lmdb_test"],
@@ -203,6 +205,7 @@ def main():
         endpoint_sigma   = cfg["DATA"]["endpoint_sigma"],
         junction_sigma   = cfg["DATA"]["junction_sigma"],
         augment          = False,
+        max_samples      = max_samples // 10 if max_samples > 0 else 0,
     )
 
     train_loader = DataLoader(

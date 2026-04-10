@@ -58,6 +58,7 @@ class LMDBStrokeDataset(Dataset):
         junction_sigma: float = 5.0,
         augment: bool = True,
         max_retries: int = 10,
+        max_samples: int = 0,          # 0=全件, N>0=先頭N件に制限
     ):
         self.thickness_range = thickness_range
         self.thickness_fixed = thickness_fixed
@@ -80,6 +81,8 @@ class LMDBStrokeDataset(Dataset):
         )
         with self.env.begin() as txn:
             self.num_samples = int(txn.get(b"num_sample"))
+        if max_samples > 0:
+            self.num_samples = min(max_samples, self.num_samples)
 
     def __len__(self):
         return self.num_samples

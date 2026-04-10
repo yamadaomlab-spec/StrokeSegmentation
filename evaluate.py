@@ -222,6 +222,7 @@ def main():
         endpoint_sigma  = cfg["DATA"]["endpoint_sigma"],
         junction_sigma  = cfg["DATA"]["junction_sigma"],
         augment         = False,
+        max_samples     = cfg["DATA"].get("max_samples", 0),
     )
     val_loader = DataLoader(
         val_ds,
